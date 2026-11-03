@@ -1,0 +1,48 @@
+
+{
+  "P001": {
+    "name": "John Doe",
+    "age": 30,
+    "gender": "Male",
+    "diagnosis": "Flu",
+    "height": 175,
+    "weight": 72,
+    "bmi": 23.51
+  },
+  "P002": {
+    "name": "Alice Smith",
+    "age": 25,
+    "gender": "Female",
+    "diagnosis": "Cold",
+    "height": 162,
+    "weight": 58,
+    "bmi": 22.10
+  },
+  "P003": {
+    "name": "Bob Johnson",
+    "age": 28,
+    "gender": "Male",
+    "diagnosis": "Allergy",
+    "height": 180,
+    "weight": 85,
+    "bmi": 26.23
+  },
+  "P004": {
+    "name": "Emma Brown",
+    "age": 32,
+    "gender": "Female",
+    "diagnosis": "Asthma",
+    "height": 168,
+    "weight": 65,
+    "bmi": 23.03
+  },
+  "P005": {
+    "name": "David Wilson",
+    "age": 27,
+    "gender": "Male",
+    "diagnosis": "Diabetes",
+    "height": 172,
+    "weight": 90,
+    "bmi": 30.42
+  }
+}
