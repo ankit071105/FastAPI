@@ -1,6 +1,6 @@
-# FastAPI & Pydantic Practice
+# FastAPI
 
-A hands-on Python project for learning **FastAPI** and **Pydantic**. It
+A hands-on Python project for learning **FastAPI** , **Pydantic** , **Docker**. It
 contains introductory API routes, JSON-based patient data handling,
 request/path/query parameter validation, sorting, and Pydantic model
 validation examples.
