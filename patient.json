@@ -52,15 +52,5 @@
         "linkedin_url": "https://aman.com/",
         "bmi": 21.84,
         "verdict": "Normal weight"
-    },
-    "P006": {
-        "name": "Aman",
-        "city": "Delhi",
-        "age": 19,
-        "gender": "Male",
-        "height": 178.0,
-        "weight": 73.0,
-        "bmi": 23.04,
-        "verdict": "Normal weight"
     }
 }
