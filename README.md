@@ -1,179 +1,188 @@
 # FastAPI
 
-A hands-on Python project for learning **FastAPI** , **Pydantic** , **Docker**. It
-contains introductory API routes, JSON-based patient data handling,
-request/path/query parameter validation, sorting, and Pydantic model
-validation examples.
+A hands-on Python project for learning **FastAPI** and **Pydantic** — from basic routes to a full CRUD patient API backed by a JSON file, and finally serving a trained **scikit-learn** model behind a `/predict` endpoint with a **Streamlit** frontend.
 
 ## Tech Stack
 
--   **Python 3.11+**
--   **FastAPI** -- building REST API endpoints
--   **Uvicorn** -- running the ASGI application
--   **Pydantic** -- data parsing and validation
--   **JSON** -- sample data storage
+- **Python 3.11+**
+- **FastAPI** — REST API endpoints
+- **Uvicorn** — ASGI server
+- **Pydantic v2** — validation, `Field` constraints, `computed_field`, custom validators
+- **scikit-learn + pandas** — insurance premium category model (`RandomForestClassifier` pipeline)
+- **Streamlit** — simple frontend for the ML API
+- **JSON** — file-based storage for patient records
 
 ## Repository Structure
 
-``` text
+```text
 FastAPI/
-├── Pydantic/          # Pydantic learning examples
-├── basic.py           # FastAPI application and API routes
-├── patient.json       # Sample patient records used by the API
-├── data.json          # Sample JSON data
-└── README.md
+├── Get_Fastapi.py        # GET routes: hello, view, patient by ID, sort
+├── Post_Fastapi.py       # POST /create — add a patient (auto BMI + verdict)
+├── Put_FastAPI.py        # PUT /edit/{id} — partial update with re-validation
+├── Delete_FastAPI.py     # DELETE /delete/{id}
+├── patient.json          # Sample patient records
+├── data.json             # Sample JSON data
+├── Fastapi.pdf           # Notes
+├── Pydantic/
+│   ├── main.py           # field_validator, model_validator, computed_field, EmailStr, AnyUrl
+│   ├── nested.py         # Nested models
+│   └── export.py         # model_dump / model_dump_json with include/exclude
+└── ml/
+    ├── main.py           # Complete Patient Management API (all CRUD in one app)
+    ├── ml.py             # Insurance premium prediction API (POST /predict)
+    ├── frontend.py       # Streamlit UI for /predict
+    ├── fastapi_ml_model.ipynb  # Model training notebook
+    ├── model.pkl         # Trained sklearn pipeline
+    └── patient.json      # Data used by ml/main.py
 ```
 
 ## Getting Started
 
-### 1. Clone the repository
+### 1. Clone
 
-``` bash
+```bash
 git clone https://github.com/ankit071105/FastAPI.git
 cd FastAPI
 ```
 
-### 2. Create a virtual environment
+### 2. Virtual environment
 
-Using Python 3.11:
-
-``` bash
+```bash
 python3.11 -m venv myenv
-```
-
-Activate it on macOS/Linux:
-
-``` bash
-source myenv/bin/activate
-```
-
-On Windows:
-
-``` powershell
-myenv\Scripts\activate
+source myenv/bin/activate        # macOS/Linux
+myenv\Scripts\activate           # Windows
 ```
 
 ### 3. Install dependencies
 
-``` bash
+```bash
 python -m pip install --upgrade pip
-python -m pip install fastapi uvicorn "pydantic[email]"
+python -m pip install fastapi uvicorn "pydantic[email]" pandas scikit-learn streamlit requests
 ```
 
-`email-validator` is installed through the `pydantic[email]` extra and
-is needed when using Pydantic's `EmailStr` type.
+> `pydantic[email]` installs `email-validator`, needed for `EmailStr`.
+> `model.pkl` is a pickled sklearn pipeline — if loading fails, install a scikit-learn version close to the one used in the notebook, or re-run the notebook to regenerate it.
 
-### 4. Run the FastAPI application
+## Running the Apps
 
-The FastAPI instance in `basic.py` is named `a`. Start it with:
+Every learning file is a separate FastAPI app. Run from the folder that contains the file so `patient.json` is found.
 
-``` bash
-uvicorn basic:a --reload
+| File | Command (from) | App instance |
+|---|---|---|
+| `Get_Fastapi.py` | `uvicorn Get_Fastapi:a --reload` (root) | `a` |
+| `Post_Fastapi.py` | `uvicorn Post_Fastapi:a --reload` (root) | `a` |
+| `Put_FastAPI.py` | `uvicorn Put_FastAPI:a --reload` (root) | `a` |
+| `Delete_FastAPI.py` | `uvicorn Delete_FastAPI:a --reload` (root) | `a` |
+| `ml/main.py` | `cd ml && uvicorn main:app --reload` | `app` |
+| `ml/ml.py` | `cd ml && uvicorn ml:app --reload` | `app` |
+
+Docs: http://127.0.0.1:8000/docs (Swagger) · http://127.0.0.1:8000/redoc
+
+## API Endpoints
+
+### Patient API (root files)
+
+| Method | Endpoint | File | Description |
+|---|---|---|---|
+| `GET` | `/` | Get | Hello World |
+| `GET` | `/math` | Get | Sample arithmetic result |
+| `GET` | `/view` | Get | All patients from `patient.json` |
+| `GET` | `/patient/{patient_id}` | Get | Patient by ID — validated with regex `^[A-Z][0-9]{3}$` (e.g. `P001`); 404 if missing |
+| `GET` | `/sort?sort_by=bmi&order=desc` | Get | Sort by `height` / `weight` / `bmi`, `asc` (default) or `desc`; 400 on invalid input |
+| `POST` | `/create` | Post | Create patient; 400 on duplicate ID |
+| `PUT` | `/edit/{patient_id}` | Put | Partial update (`exclude_unset`), BMI + verdict recalculated, atomic file save |
+| `DELETE` | `/delete/{patient_id}` | Delete | Delete patient; 404 if missing |
+
+`ml/main.py` contains all of the above (`/`, `/about`, `/view`, `/patient/{id}`, `/sort`, `/create`, `/edit/{id}`, `/delete/{id}`) in a single app.
+
+**Create request example:**
+
+```json
+POST /create
+{
+  "id": "P006",
+  "name": "Ankit",
+  "city": "Delhi",
+  "age": 22,
+  "gender": "Male",
+  "height": 1.72,
+  "weight": 68
+}
 ```
 
-Open the API at:
+`bmi` and `verdict` (Underweight / Normal weight / Overweight / Obese) are computed automatically with `@computed_field`. Height accepts metres or centimetres (values > 3 are treated as cm) in `Post_Fastapi.py`, `Put_FastAPI.py` and `Delete_FastAPI.py`.
 
--   Application: http://127.0.0.1:8000
--   Interactive Swagger documentation: http://127.0.0.1:8000/docs
--   ReDoc documentation: http://127.0.0.1:8000/redoc
+### ML Prediction API (`ml/ml.py`)
 
-> Run the command from the repository root so that `patient.json` can be
-> found using the relative path in the application.
+`POST /predict` — predicts an insurance premium category.
 
-## Available API Endpoints
-
-The following routes are implemented in `basic.py`:
-
-  ----------------------------------------------------------------------------------
-  Method                  Endpoint                           Description
-  ----------------------- ---------------------------------- -----------------------
-  `GET`                   `/`                                Returns a Hello World
-                                                             message.
-
-  `GET`                   `/math`                            Returns the result of a
-                                                             sample arithmetic
-                                                             expression.
-
-  `GET`                   `/view`                            Returns the patient
-                                                             data loaded from
-                                                             `patient.json`.
-
-  `GET`                   `/patient/{patient_id}`            Fetches a patient by
-                                                             ID. The ID is validated
-                                                             (for example, `P001`).
-                                                             Returns 404 if the
-                                                             patient is not found.
-
-  `GET`                   `/sort?sort_by=height&order=asc`   Sorts patient records
-                                                             by `height`, `weight`,
-                                                             or `bmi`, in ascending
-                                                             or descending order.
-  ----------------------------------------------------------------------------------
-
-### Example requests
-
-``` text
-GET http://127.0.0.1:8000/
-GET http://127.0.0.1:8000/view
-GET http://127.0.0.1:8000/patient/P001
-GET http://127.0.0.1:8000/sort?sort_by=height&order=asc
+```json
+{
+  "age": 30,
+  "weight": 65,
+  "height": 1.7,
+  "income_lpa": 10,
+  "smoker": false,
+  "city": "Mumbai",
+  "occupation": "private_job"
+}
 ```
 
-The `/sort` endpoint accepts `sort_by` values `height`, `weight`, or
-`bmi`. The `order` parameter accepts `asc` or `desc` and defaults to
-`asc`.
+Response:
+
+```json
+{ "predicted_category": "Low" }
+```
+
+Features engineered inside the Pydantic model before prediction:
+
+- `bmi` — weight / height²
+- `age_group` — young / adult / middle_aged / senior
+- `lifestyle_risk` — low / medium / high (smoker + BMI)
+- `city_tier` — 1 / 2 / 3 from built-in city lists
+
+`occupation` must be one of: `retired`, `freelancer`, `student`, `government_job`, `business_owner`, `unemployed`, `private_job`.
+
+### Streamlit Frontend
+
+```bash
+# terminal 1
+cd ml && uvicorn ml:app --reload
+# terminal 2
+cd ml && streamlit run frontend.py
+```
 
 ## Pydantic Concepts Practiced
 
-The Pydantic examples cover common data validation concepts, including:
+- `BaseModel`, required fields, defaults, `Optional`
+- `Annotated` + `Field` constraints (`gt`, `lt`, `min_length`, `max_length`, `strict`)
+- `Literal` for fixed choices
+- `EmailStr`, `AnyUrl`, `HttpUrl`
+- `@field_validator` (before/after mode) and `@model_validator`
+- `@computed_field` for derived values (BMI, verdict, age group, city tier)
+- Nested models
+- `model_dump()` / `model_dump_json()` with `include`, `exclude`, `exclude_unset`
+- Type coercion (e.g. `"true"` → `True`)
 
--   `BaseModel` for defining structured data models.
--   Required fields and default values.
--   `EmailStr` for email validation.
--   `Optional` fields and `None` defaults.
--   `List` and `Dict` type annotations.
--   Automatic conversion of compatible input values (for example, a
-    numeric string to an integer).
--   Validation errors when input data does not match the model.
+## Known Issues / TODO
 
-Example model:
-
-``` python
-from pydantic import BaseModel, EmailStr
-from typing import Dict, List, Optional
-
-class Patient(BaseModel):
-    name: str
-    email: EmailStr
-    age: int
-    weight: float
-    marry: bool
-    allergies: Optional[List[str]] = None
-    contact: Dict[str, str]
-```
+- `ml/frontend.py` expects a `response` key with `confidence` and `class_probabilities`, but `ml/ml.py` returns only `{"predicted_category": ...}` — the UI will show an API error until one side is updated.
+- In `Pydantic/main.py`, the email validator *allows only* `hdfc.com`, `sbi.com`, `icici.com`, but the error message says the opposite.
+- `ml/main.py` maps BMI 25–30 to `"Normal"` instead of `"Overweight"`.
+- `Post_Fastapi.py` sets `status_code=201` on the route but returns a `JSONResponse` with 200.
+- Storage is a local JSON file — no database, not safe for concurrent writes.
 
 ## Learning Goals
 
--   Understand how to create API routes using FastAPI.
--   Work with path and query parameters.
--   Validate input values and handle HTTP errors.
--   Read structured data from JSON files.
--   Define and validate data models with Pydantic.
--   Run and test an API locally using Uvicorn and the interactive API
-    documentation.
-
-## Notes
-
--   This repository is a learning/practice project; the patient records
-    are sample data.
--   The current API reads patient records from a local JSON file. It
-    does not use a database.
--   Keep the virtual environment active when installing dependencies and
-    running the application.
+- Build REST APIs with FastAPI (GET, POST, PUT, DELETE)
+- Use path and query parameters with validation
+- Handle errors with `HTTPException`
+- Validate and transform data with Pydantic
+- Serve an ML model through an API and consume it from a frontend
 
 ## Author
 
 **Ankit Kumar**
 
--   GitHub: [@ankit071105](https://github.com/ankit071105)
--   Repository: [FastAPI](https://github.com/ankit071105/FastAPI)
+- GitHub: [@ankit071105](https://github.com/ankit071105)
+- Repository: [FastAPI](https://github.com/ankit071105/FastAPI)
