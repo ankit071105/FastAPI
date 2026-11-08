@@ -1,48 +1,72 @@
-
 {
-  "P001": {
-    "name": "John Doe",
-    "age": 30,
-    "gender": "Male",
-    "diagnosis": "Flu",
-    "height": 175,
-    "weight": 72,
-    "bmi": 23.51
-  },
-  "P002": {
-    "name": "Alice Smith",
-    "age": 25,
-    "gender": "Female",
-    "diagnosis": "Cold",
-    "height": 162,
-    "weight": 58,
-    "bmi": 22.10
-  },
-  "P003": {
-    "name": "Bob Johnson",
-    "age": 28,
-    "gender": "Male",
-    "diagnosis": "Allergy",
-    "height": 180,
-    "weight": 85,
-    "bmi": 26.23
-  },
-  "P004": {
-    "name": "Emma Brown",
-    "age": 32,
-    "gender": "Female",
-    "diagnosis": "Asthma",
-    "height": 168,
-    "weight": 65,
-    "bmi": 23.03
-  },
-  "P005": {
-    "name": "David Wilson",
-    "age": 27,
-    "gender": "Male",
-    "diagnosis": "Diabetes",
-    "height": 172,
-    "weight": 90,
-    "bmi": 30.42
-  }
+    "P001": {
+        "name": "Ananya Verma",
+        "city": "Guwahati",
+        "age": 28,
+        "gender": "female",
+        "height": 1.65,
+        "weight": 90.0,
+        "bmi": 33.06,
+        "verdict": "Obese"
+    },
+    "P002": {
+        "name": "Ravi Mehta",
+        "city": "Mumbai",
+        "age": 35,
+        "gender": "male",
+        "height": 1.75,
+        "weight": 85,
+        "bmi": 27.76,
+        "verdict": "Overweight"
+    },
+    "P003": {
+        "name": "Sneha Kulkarni",
+        "city": "Pune",
+        "age": 22,
+        "gender": "female",
+        "height": 1.6,
+        "weight": 45,
+        "bmi": 17.58,
+        "verdict": "Underweight"
+    },
+    "P004": {
+        "name": "Arjun Verma",
+        "city": "Mumbai",
+        "age": 40,
+        "gender": "male",
+        "height": 1.8,
+        "weight": 90.0,
+        "bmi": 27.78,
+        "verdict": "Normal"
+    },
+    "P005": {
+        "name": "Neha Sinha",
+        "city": "Kolkata",
+        "age": 30,
+        "gender": "female",
+        "height": 1.55,
+        "weight": 75,
+        "bmi": 31.22,
+        "verdict": "Obese"
+    },
+    "P006": {
+        "name": "Aman",
+        "city": "Delhi",
+        "age": 19,
+        "gender": "Male",
+        "height": 178.0,
+        "weight": 73.0,
+        "bmi": 23.04,
+        "verdict": "Normal weight"
+    },
+    "P007": {
+        "name": "Avnish",
+        "city": "Delhi",
+        "age": 19,
+        "gender": "Male",
+        "height": 189.0,
+        "weight": 89.0,
+        "bmi": 24.92,
+        "verdict": "Normal weight"
+    }
 }
